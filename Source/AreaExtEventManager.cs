@@ -51,9 +51,36 @@ namespace AreaInclusionExclusion
         {
             CheckAndRemoveDeadRef();
 
-            foreach (var r in allAreaExts)
+#if DEBUG
+            Log.Message($"Area {area.ID} Removed");
+#endif
+
+            foreach (var areaExt in allAreaExts)
             {
-                r.Target.OnAreaRemoved(area);
+                areaExt.Target.OnAreaRemoved(area);
+            }
+        }
+
+        public static void OnMapRemoved(Map map)
+        {
+#if DEBUG
+            Log.Message($"Map {map.uniqueID} is removed");
+#endif
+            foreach (var pawn in Find.WorldPawns.AllPawnsAliveOrDead)
+            {
+                if (pawn.playerSettings == null)
+                {
+                    continue;
+                }
+
+                var areaExt = pawn.playerSettings.AreaRestriction as AreaExt;
+                if (areaExt != null)
+                {
+                    if (map.uniqueID == areaExt.MapID)
+                    {
+                        pawn.playerSettings.AreaRestriction = null;
+                    }
+                }
             }
         }
 
@@ -67,9 +94,9 @@ namespace AreaInclusionExclusion
                 CheckAndRemoveDeadRef();
             }
 
-            foreach (var r in allAreaExts)
+            foreach (var areaExt in allAreaExts)
             {
-                r.Target.OnAreaUpdate();
+                areaExt.Target.OnAreaUpdate();
             }
         }
     }

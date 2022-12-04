@@ -36,6 +36,11 @@ namespace AreaInclusionExclusion
         public override int ListPriority => int.MaxValue;
         public int MapID => areaExtID.MapID;
         public bool Empty => areaExtID.Areas.Count == 0;
+        public bool IsOneInclusion => areaExtID.Areas.Count == 1 && areaExtID.Areas[0].Value == AreaExtOperator.Inclusion;
+        public bool IsWholeExclusive => areaExtID.Areas.Count >= 1 && areaExtID.Areas[0].Value == AreaExtOperator.Exclusion;
+
+        public bool Contains(Area area) => areaExtID.Areas.Any(x => x.Key == area.ID);
+        public bool Contains(Area area, AreaExtOperator op) => areaExtID.Areas.Any(x => x.Key == area?.ID && x.Value == op);
 
         public List<KeyValuePair<Area, AreaExtOperator>> InnerAreas
         {
@@ -139,6 +144,11 @@ namespace AreaInclusionExclusion
 #endif
 
             Map map = Find.Maps.Find(x => x.uniqueID == areaExtID.MapID);
+            if (map == null)
+            {
+                return;
+            }
+
             this.areaManager = map.areaManager;
 
             var innerAreas = InnerAreas;
